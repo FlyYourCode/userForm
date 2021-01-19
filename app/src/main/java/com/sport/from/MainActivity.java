@@ -32,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged(List<String> strings) {
                 validateV6(strings);
+
+
             }
         });
     }
