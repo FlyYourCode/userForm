@@ -1,0 +1,45 @@
+name: Auto build debug apk
+
+# 设置workflow的触发条件
+# 在pull和push到主分支时触发workflow
+# 在push tags时触发workflow
+on:
+  pull_request:
+    branches:
+      - 'master'
+  push:
+    branches:
+      - 'master'
+    # 在push tag时触发
+    tags:
+      - '*'
+
+# workflow的所有作业job
+jobs:
+  # 单个job的名字：测试Android项目
+  # 每个job执行完毕会默认删除所有文件等
+  #   可通过cache来保留特定文件夹和文件
+  #   也可使用upload-artifact上传来实现保留文件，再配合download-artifact实现多job之间的数据传递
+
+  apk:
+    name: Generate APK
+    runs-on: ubuntu-18.04
+    
+    steps:
+      - uses: actions/checkout@v2
+      - name: set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      - name: Build debug APK
+        run: bash ./gradlew assembleDebug --stacktrace
+      # 利用upload-artifact实现build结果的保存（可以在Actions的控制台下载压缩文件）
+      - name: Upload APK
+        uses: actions/upload-artifact@v2
+        with:
+          # 设置压缩文件的名称，在控制台会得到WhuHelper-debug.zip文件的下载链接
+          # 下载后解压缩，里面直接可以看到app-debug.apk，没有其他东西
+          name: WhuHelper-debug
+          path: app/build/outputs/apk/debug/app-debug.apk
+
+  
